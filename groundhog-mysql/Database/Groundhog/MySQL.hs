@@ -26,7 +26,7 @@ import Control.Arrow (first, second, (***))
 import Control.Monad (liftM2, (>=>))
 import Control.Monad.IO.Class (MonadIO (..))
 import Control.Monad.Trans.Class (lift)
-import Control.Monad.Trans.Control (MonadBaseControl)
+import Control.Monad.Trans.Control (MonadBaseControl, liftBaseOp)
 import Control.Monad.Trans.Reader (ask)
 import Control.Monad.Trans.State (mapStateT)
 import Data.Acquire (mkAcquire)
@@ -141,7 +141,7 @@ createMySQLPool ::
   -- | number of connections to open
   Int ->
   m (Pool MySQL)
-createMySQLPool s connCount = liftIO $ createPool (open' s) close' 1 20 connCount
+createMySQLPool s connCount = liftIO $ newPool $ defaultPoolConfig (open' s) close' 20 connCount
 
 withMySQLConn ::
   (MonadBaseControl IO m, MonadIO m) =>
@@ -187,7 +187,7 @@ instance ExtractConnection MySQL MySQL where
   extractConn f conn = f conn
 
 instance ExtractConnection (Pool MySQL) MySQL where
-  extractConn f pconn = withResource pconn f
+  extractConn f pconn = liftBaseOp (withResource pconn) f
 
 open' :: MySQL.ConnectInfo -> IO MySQL
 open' ci = do

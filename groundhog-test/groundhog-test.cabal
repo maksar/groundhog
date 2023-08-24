@@ -42,7 +42,7 @@ test-suite test
                  , containers               >= 0.2
                  , monad-control            >= 0.3     && < 1.1
                  , monad-logger             >= 0.3     && < 0.4
-                 , resource-pool            >= 0.2.1
+                 , resource-pool            >= 0.4
                  , transformers-base
                  , template-haskell
                  , yaml                     >= 0.11    && < 0.12

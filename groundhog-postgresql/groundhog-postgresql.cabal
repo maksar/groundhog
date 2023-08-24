@@ -26,7 +26,7 @@ library
                    , containers               >= 0.2
                    , text                     >= 0.8
                    , attoparsec               >= 0.8.5.3
-                   , resource-pool            >= 0.2.1
+                   , resource-pool            >= 0.4
                    , time                     >= 1.1
                    , vector                   >= 0.10     && < 0.13
                    , resourcet                >= 1.1.2

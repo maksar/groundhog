@@ -26,7 +26,7 @@ import Control.Exception (throw)
 import Control.Monad (forM, liftM2, (>=>))
 import Control.Monad.IO.Class (MonadIO (..))
 import Control.Monad.Trans.Class (lift)
-import Control.Monad.Trans.Control (MonadBaseControl)
+import Control.Monad.Trans.Control (MonadBaseControl, liftBaseOp)
 import Control.Monad.Trans.Reader (ask)
 import Control.Monad.Trans.State (mapStateT)
 import Data.Acquire (mkAcquire)
@@ -163,7 +163,7 @@ createPostgresqlPool ::
   -- | number of connections to open
   Int ->
   m (Pool Postgresql)
-createPostgresqlPool s connCount = liftIO $ createPool (open' s) close' 1 20 connCount
+createPostgresqlPool s connCount = liftIO $ newPool $ defaultPoolConfig (open' s) close' 20 connCount
 
 -- Not sure of the best way to handle Semigroup/Monoid changes in ghc 8.4
 -- here. It appears that the long SQL query text interferes with the use
@@ -204,7 +204,7 @@ instance ExtractConnection Postgresql Postgresql where
   extractConn f conn = f conn
 
 instance ExtractConnection (Pool Postgresql) Postgresql where
-  extractConn f pconn = withResource pconn f
+  extractConn f pconn = liftBaseOp (withResource pconn) f
 
 open' :: String -> IO Postgresql
 open' s = do
